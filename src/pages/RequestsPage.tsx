@@ -109,7 +109,7 @@ const RequestsPage: React.FC = () => {
               
               {request.resolvedAt && (
                 <p className="text-sm text-gray-600 mt-4">
-                  {request.status === 'approved' ? 'Cancelled' : 'Not Cancelled'} on{' '}
+                  {request.status === 'approved' ? 'Cancelled' : 'Cancellation Rejected'} on{' '}
                   {format(parseISO(request.resolvedAt), 'dd/MM/yyyy HH:mm')}
                 </p>
               )}
