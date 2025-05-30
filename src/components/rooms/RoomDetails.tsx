@@ -29,6 +29,8 @@ const RoomDetails: React.FC<RoomDetailsProps> = ({ roomId, onBack, onDeleted }) 
   const room = getRoomById(roomId);
   const currentBookings = getCurrentBookingsForRoom(roomId);
   const futureBookings = getFutureBookingsForRoom(roomId);
+  const activeCurrentBookings = currentBookings.filter(b => !b.cancelledAt);
+  const activeFutureBookings = futureBookings.filter(b => !b.cancelledAt);
   const userRole = getCurrentUserRole();
   const isAdmin = userRole === 'admin';
   
