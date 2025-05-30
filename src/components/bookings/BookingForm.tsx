@@ -154,7 +154,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ roomId, onSubmit, onCancel })
         
         <div>
           <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-            Phone Number*
+            Phone NumberD*
           </label>
           <input
             type="tel"
