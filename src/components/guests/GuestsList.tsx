@@ -73,7 +73,9 @@ const GuestsList: React.FC = () => {
                     </div>
                     <div className="flex items-center text-sm">
                       <Calendar className="h-4 w-4 mr-2 text-gray-500" />
-                      <span className="text-gray-700">{bookings.length} Bookings</span>
+                      <span className="text-gray-700">
+                        {bookings.length} Bookings{cancelledBookings > 0 && ` (${cancelledBookings} Cancelled)`}
+                      </span>
                     </div>
                   </div>
                   
