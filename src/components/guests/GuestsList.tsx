@@ -53,7 +53,7 @@ const GuestsList: React.FC = () => {
             const bookings = getBookingsForGuest(guest.id);
             const activeBooking = bookings.find(b => b.checkInDateTime && !b.checkOutDateTime);
             const pastBookings = bookings.filter(b => b.checkOutDateTime);
-            const futureBookings = bookings.filter(b => !b.checkInDateTime);
+            const futureBookings = bookings.filter(b => !b.checkInDateTime && !b.cancelledAt);
             
             return (
               <div key={guest.id} className="card">
