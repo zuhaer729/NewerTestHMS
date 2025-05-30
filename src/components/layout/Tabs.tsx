@@ -52,7 +52,7 @@ const Tabs: React.FC<TabsProps> = ({ activeTab, setActiveTab }) => {
       <div className="container mx-auto">
         <nav className="flex justify-between items-center" aria-label="Tabs">
           {/* Left-aligned tabs */}
-          <div className="flex space-x-4">
+          <div className="flex space-x-1">
             {visibleTabs
               .filter((tab) => tab.id !== 'overview' && tab.id !== 'requests')
               .map((tab) => (
@@ -73,7 +73,7 @@ const Tabs: React.FC<TabsProps> = ({ activeTab, setActiveTab }) => {
           </div>
   
           {/* Right-aligned tabs */}
-          <div className="flex space-x-4">
+          <div className="flex space-x-1">
             {isAdmin && (
               <button
                 onClick={() => setActiveTab('requests')}
