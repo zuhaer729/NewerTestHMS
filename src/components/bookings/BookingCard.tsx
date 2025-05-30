@@ -3,6 +3,7 @@ import { Booking } from '../../types';
 import { User, Calendar, Clock, CreditCard, Users, X, Plus } from 'lucide-react';
 import { format, parseISO, addDays } from 'date-fns';
 import { useBookingStore } from '../../store/useBookingStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import toast from 'react-hot-toast';
 
 interface BookingCardProps {
@@ -14,13 +15,19 @@ interface BookingCardProps {
 }
 
 const BookingCard: React.FC<BookingCardProps> = ({ booking, isActive, showRoom = false, roomNumber, onUpdate }) => {
-  const { checkIn, checkOut, updateBooking, getCurrentBookingsForRoom, isRoomAvailable } = useBookingStore();
+  const { checkIn, checkOut, updateBooking, getCurrentBookingsForRoom, isRoomAvailable, requestCancellation, getCancellationRequestForBooking, cancelBooking } = useBookingStore();
+  const { getCurrentUserRole, getCurrentUser } = useAuthStore();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showExtendModal, setShowExtendModal] = useState(false);
   const [paidAmount, setPaidAmount] = useState(booking.paidAmount.toString());
   const [extraDays, setExtraDays] = useState('1');
   const [extraAmount, setExtraAmount] = useState('0');
   const [action, setAction] = useState<'checkIn' | 'checkOut' | null>(null);
+  
+  const userRole = getCurrentUserRole();
+  const currentUser = getCurrentUser();
+  
+  const cancellationRequest = getCancellationRequestForBooking(booking.id);
   
   const handleCheckIn = () => {
     const currentBookings = getCurrentBookingsForRoom(booking.roomId);
@@ -38,6 +45,28 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, isActive, showRoom =
     setAction('checkOut');
     setPaidAmount(booking.paidAmount.toString());
     setShowPaymentModal(true);
+  };
+
+  const handleCancellation = () => {
+    try {
+      if (userRole === 'admin') {
+        const success = cancelBooking(booking.id);
+        if (success) {
+          toast.success('Booking cancelled successfully');
+          if (onUpdate) onUpdate();
+        } else {
+          toast.error('Failed to cancel booking');
+        }
+      } else if (userRole === 'manager' && currentUser) {
+        const requestId = requestCancellation(booking.id, currentUser.id);
+        if (requestId) {
+          toast.success('Cancellation request submitted');
+          if (onUpdate) onUpdate();
+        }
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to process cancellation');
+    }
   };
 
   const handleExtendBooking = () => {
@@ -197,13 +226,25 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, isActive, showRoom =
           )}
           
           <div className="mt-4 space-y-2">
-            {!booking.checkInDateTime && (
-              <button
-                onClick={handleCheckIn}
-                className="btn btn-primary w-full"
-              >
-                Check In
-              </button>
+            {!booking.checkInDateTime && !booking.cancelledAt && (
+              <>
+                <button
+                  onClick={handleCheckIn}
+                  className="btn btn-primary w-full"
+                >
+                  Check In
+                </button>
+                
+                {(userRole === 'admin' || userRole === 'manager') && (
+                  <button
+                    onClick={handleCancellation}
+                    className="btn btn-danger w-full"
+                    disabled={!!cancellationRequest?.status === 'pending'}
+                  >
+                    {userRole === 'admin' ? 'Cancel Booking' : 'Request Cancellation'}
+                  </button>
+                )}
+              </>
             )}
             
             {booking.checkInDateTime && !booking.checkOutDateTime && (
@@ -222,6 +263,18 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, isActive, showRoom =
                   Check Out
                 </button>
               </>
+            )}
+
+            {booking.cancelledAt && (
+              <div className="bg-red-100 text-red-800 px-4 py-2 rounded-md text-sm">
+                Booking cancelled on {format(parseISO(booking.cancelledAt), 'dd/MM/yyyy HH:mm')}
+              </div>
+            )}
+            
+            {cancellationRequest?.status === 'pending' && (
+              <div className="bg-amber-100 text-amber-800 px-4 py-2 rounded-md text-sm">
+                Cancellation request pending
+              </div>
             )}
           </div>
         </div>
