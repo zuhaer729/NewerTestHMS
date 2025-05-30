@@ -70,10 +70,10 @@ const RequestsPage: React.FC = () => {
                   'bg-red-100 text-red-800'
                 }`}>
                   {request.status === 'approved' 
-                  ? 'Cancelled' 
-                  : request.status === 'rejected' 
-                  ? 'Not Cancelled' 
-                  : 'Pending'}
+                    ? 'Cancelled' 
+                    : request.status === 'rejected' 
+                    ? 'Not Cancelled' 
+                    : 'Pending'}
 
                 </div>
               </div>
