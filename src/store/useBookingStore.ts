@@ -141,8 +141,20 @@ export const useBookingStore = create<BookingState>((set, get) => ({
     if (!booking || booking.checkInDateTime) return false;
     
     const checkInDateTime = new Date().toISOString();
-    return get().updateBooking(bookingId, { checkInDateTime });
+    const updated = get().updateBooking(bookingId, { checkInDateTime });
+  
+    if (updated) {
+      // Remove any cancellation request for this booking
+      set(state => ({
+        cancellationRequests: state.cancellationRequests.filter(
+          (request) => request.bookingId !== bookingId
+        )
+      }));
+    }
+  
+    return updated;
   },
+
 
   checkOut: (bookingId) => {
     const booking = get().getBookingById(bookingId);
