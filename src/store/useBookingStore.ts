@@ -262,6 +262,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
     return !bookings.some((booking) => {
       if (excludeBookingId && booking.id === excludeBookingId) return false;
       if (booking.checkOutDateTime) return false; // Room is available if booking is checked out
+      if (booking.cancelledAt) return false;
       
       const bookingStart = startOfDay(parseISO(booking.bookingDate));
       const bookingEnd = startOfDay(addDays(parseISO(booking.bookingDate), booking.durationDays - 1));
