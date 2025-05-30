@@ -167,7 +167,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
       throw new Error('Cannot request cancellation for this booking');
     }
 
-    const existingRequest = getCancellationRequestForBooking(bookingId);
+    const existingRequest = get().getCancellationRequestForBooking(bookingId);
     if (existingRequest && existingRequest === 'pending') {
       throw new Error('Cancellation request already exists');
     }
