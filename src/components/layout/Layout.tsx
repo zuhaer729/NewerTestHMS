@@ -21,7 +21,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
         </div>
       </main>
       <Toaster
-        position="top-left"
+        position="bottom-left"
         toastOptions={{
           style: {
             background: '#363636',
