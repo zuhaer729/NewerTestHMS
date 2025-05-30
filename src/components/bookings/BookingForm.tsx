@@ -126,7 +126,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ roomId, onSubmit, onCancel })
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label htmlFor="nationalId" className="block text-sm font-medium text-gray-700 mb-1">
-            National ID*
+            ID*
           </label>
           <input
             type="text"
