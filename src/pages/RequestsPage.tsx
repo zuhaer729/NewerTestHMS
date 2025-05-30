@@ -8,11 +8,10 @@ import toast from 'react-hot-toast';
 
 const RequestsPage: React.FC = () => {
   const { getCancellationRequests, approveCancellation, rejectCancellation, getBookingById } = useBookingStore();
-  const { getCurrentUser } = useAuthStore();
+  const { currentUser } = useAuthStore();
   const { getRoomById } = useRoomStore();
   
   const requests = getCancellationRequests();
-  const currentUser = getCurrentUser();
   
   const handleApprove = (requestId: string) => {
     if (!currentUser) return;
