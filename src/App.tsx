@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from './components/layout/Layout';
 import LoginForm from './components/auth/LoginForm';
 import RoomsPage from './pages/RoomsPage';
@@ -11,7 +11,14 @@ import { useAuthStore } from './store/useAuthStore';
 
 function App() {
   const [activeTab, setActiveTab] = useState<TabType>('rooms');
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, currentUser } = useAuthStore();
+
+  useEffect(() => {
+    if (currentUser) {
+      setActiveTab('rooms');
+    }
+  }, [currentUser]);
+
 
   if (!isAuthenticated) {
     return <LoginForm />;
