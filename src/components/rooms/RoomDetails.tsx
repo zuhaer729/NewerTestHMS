@@ -226,7 +226,7 @@ const RoomDetails: React.FC<RoomDetailsProps> = ({ roomId, onBack, onDeleted }) 
             </div>
             
             <div className="space-y-4">
-              {currentBookings.length === 0 && futureBookings.length === 0 ? (
+              {activeCurrentBookings.length === 0 && activeFutureBookings.length === 0 ? (
                 <p className="text-gray-500 text-center py-8">No current or future bookings</p>
               ) : (
                 <>
