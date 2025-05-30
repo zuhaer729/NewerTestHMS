@@ -41,7 +41,7 @@ const Tabs: React.FC<TabsProps> = ({ activeTab, setActiveTab }) => {
     {
       id: 'overview',
       label: 'Overview',
-      icon: <LayoutDashboard className="w-3 h-3 md:w-5 md:h-5" />,
+      icon: <LayoutDashboard className="w-4 h-4 md:w-5 md:h-5" />,
     },
   ];
 
