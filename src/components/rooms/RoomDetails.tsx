@@ -240,7 +240,7 @@ const RoomDetails: React.FC<RoomDetailsProps> = ({ roomId, onBack, onDeleted }) 
                     />
                   ))}
                   
-                  {futureBookings.map(booking => (
+                  {activeFutureBookings.map(booking => (
                     <BookingCard 
                       key={`${booking.id}-${refreshKey}`}
                       booking={booking}
