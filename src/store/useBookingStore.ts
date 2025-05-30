@@ -1,10 +1,11 @@
 import { create } from 'zustand';
-import { Booking, RoomFilter } from '../types';
+import { Booking, RoomFilter, CancellationRequest } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { isWithinInterval, parseISO, addDays, isBefore, isAfter, startOfDay } from 'date-fns';
 
 interface BookingState {
   bookings: Booking[];
+  cancellationRequests: CancellationRequest[];
   addBooking: (booking: Omit<Booking, 'id'>) => string;
   updateBooking: (id: string, bookingData: Partial<Booking>) => boolean;
   deleteBooking: (id: string) => boolean;
@@ -14,6 +15,13 @@ interface BookingState {
   getAllBookings: () => Booking[];
   checkIn: (bookingId: string) => boolean;
   checkOut: (bookingId: string) => boolean;
+  cancelBooking: (bookingId: string) => boolean;
+  requestCancellation: (bookingId: string, userId: string) => string;
+  approveCancellation: (requestId: string, userId: string) => boolean;
+  rejectCancellation: (requestId: string, userId: string) => boolean;
+  getCancellationRequests: () => CancellationRequest[];
+  getPendingCancellationRequests: () => CancellationRequest[];
+  getCancellationRequestForBooking: (bookingId: string) => CancellationRequest | undefined;
   isRoomAvailable: (roomId: string, startDate: string, endDate: string, excludeBookingId?: string) => boolean;
   getCurrentBookingsForRoom: (roomId: string) => Booking[];
   getFutureBookingsForRoom: (roomId: string) => Booking[];
@@ -70,6 +78,7 @@ const initialBookings: Booking[] = [
 
 export const useBookingStore = create<BookingState>((set, get) => ({
   bookings: initialBookings,
+  cancellationRequests: [],
 
   addBooking: (bookingData) => {
     const id = uuidv4();
@@ -141,6 +150,107 @@ export const useBookingStore = create<BookingState>((set, get) => ({
     
     const checkOutDateTime = new Date().toISOString();
     return get().updateBooking(bookingId, { checkOutDateTime });
+  },
+
+  cancelBooking: (bookingId) => {
+    const booking = get().getBookingById(bookingId);
+    if (!booking || booking.checkInDateTime || booking.cancelledAt) return false;
+    
+    return get().updateBooking(bookingId, {
+      cancelledAt: new Date().toISOString()
+    });
+  },
+
+  requestCancellation: (bookingId, userId) => {
+    const booking = get().getBookingById(bookingId);
+    if (!booking || booking.checkInDateTime || booking.cancelledAt) {
+      throw new Error('Cannot request cancellation for this booking');
+    }
+
+    const existingRequest = get().getCancellationRequestForBooking(bookingId);
+    if (existingRequest && existingRequest.status === 'pending') {
+      throw new Error('Cancellation request already exists');
+    }
+
+    const id = uuidv4();
+    const request: CancellationRequest = {
+      id,
+      bookingId,
+      requestedBy: userId,
+      requestedAt: new Date().toISOString(),
+      status: 'pending'
+    };
+
+    set(state => ({
+      cancellationRequests: [...state.cancellationRequests, request]
+    }));
+
+    return id;
+  },
+
+  approveCancellation: (requestId, userId) => {
+    let success = false;
+    
+    set(state => {
+      const updatedRequests = state.cancellationRequests.map(request => {
+        if (request.id === requestId && request.status === 'pending') {
+          success = true;
+          return {
+            ...request,
+            status: 'approved',
+            resolvedAt: new Date().toISOString(),
+            resolvedBy: userId
+          };
+        }
+        return request;
+      });
+
+      if (success) {
+        const request = state.cancellationRequests.find(r => r.id === requestId);
+        if (request) {
+          get().cancelBooking(request.bookingId);
+        }
+      }
+
+      return { cancellationRequests: updatedRequests };
+    });
+
+    return success;
+  },
+
+  rejectCancellation: (requestId, userId) => {
+    let success = false;
+    
+    set(state => {
+      const updatedRequests = state.cancellationRequests.map(request => {
+        if (request.id === requestId && request.status === 'pending') {
+          success = true;
+          return {
+            ...request,
+            status: 'rejected',
+            resolvedAt: new Date().toISOString(),
+            resolvedBy: userId
+          };
+        }
+        return request;
+      });
+
+      return { cancellationRequests: updatedRequests };
+    });
+
+    return success;
+  },
+
+  getCancellationRequests: () => {
+    return get().cancellationRequests;
+  },
+
+  getPendingCancellationRequests: () => {
+    return get().cancellationRequests.filter(request => request.status === 'pending');
+  },
+
+  getCancellationRequestForBooking: (bookingId) => {
+    return get().cancellationRequests.find(request => request.bookingId === bookingId);
   },
 
   isRoomAvailable: (roomId, startDate, endDate, excludeBookingId) => {

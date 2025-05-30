@@ -42,9 +42,20 @@ export interface Booking {
   durationDays: number;
   checkInDateTime?: string; // ISO date-time string
   checkOutDateTime?: string; // ISO date-time string
+  cancelledAt?: string; // ISO date-time string
 }
 
-export type TabType = 'rooms' | 'guests' | 'bookings';
+export interface CancellationRequest {
+  id: string;
+  bookingId: string;
+  requestedBy: string; // User ID
+  requestedAt: string; // ISO date-time string
+  status: 'pending' | 'approved' | 'rejected';
+  resolvedAt?: string; // ISO date-time string
+  resolvedBy?: string; // User ID
+}
+
+export type TabType = 'rooms' | 'guests' | 'bookings' | 'overview' | 'requests';
 
 export type RoomFilter = {
   category?: RoomCategory;
