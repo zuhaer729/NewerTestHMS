@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';  // <-- import useEffect
 import Layout from './components/layout/Layout';
 import LoginForm from './components/auth/LoginForm';
 import RoomsPage from './pages/RoomsPage';
@@ -11,14 +11,14 @@ import { useAuthStore } from './store/useAuthStore';
 
 function App() {
   const [activeTab, setActiveTab] = useState<TabType>('rooms');
-  const { isAuthenticated, currentUser } = useAuthStore();
+  const { isAuthenticated, currentUser } = useAuthStore();  // <-- also grab currentUser
 
+  // This will reset tab to rooms after every login
   useEffect(() => {
     if (currentUser) {
       setActiveTab('rooms');
     }
   }, [currentUser]);
-
 
   if (!isAuthenticated) {
     return <LoginForm />;
