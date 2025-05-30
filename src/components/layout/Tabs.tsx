@@ -20,28 +20,28 @@ const Tabs: React.FC<TabsProps> = ({ activeTab, setActiveTab }) => {
     {
       id: 'rooms',
       label: 'Rooms',
-      icon: <BedDouble className="w-5 h-5" />,
+      icon: <BedDouble className="w-4 h-4 md:w-5 md:h-5" />,
     },
     {
       id: 'guests',
       label: 'Guests',
-      icon: <Users className="w-5 h-5" />,
+      icon: <Users className="w-4 h-4 md:w-5 md:h-5" />,
     },
     {
       id: 'bookings',
       label: 'Bookings',
-      icon: <Calendar className="w-5 h-5" />,
+      icon: <Calendar className="w-4 h-4 md:w-5 md:h-5" />,
     },
     {
       id: 'requests',
       label: 'Requests',
-      icon: <AlertCircle className="w-5 h-5" />,
+      icon: <AlertCircle className="w-4 h-4 md:w-5 md:h-5" />,
       adminOnly: true,
     },
     {
       id: 'overview',
       label: 'Overview',
-      icon: <LayoutDashboard className="w-5 h-5" />,
+      icon: <LayoutDashboard className="w-4 h-4 md:w-5 md:h-5" />,
     },
   ];
 
