@@ -21,7 +21,7 @@ interface BookingState {
   rejectCancellation: (requestId: string, userId: string) => boolean;
   getCancellationRequests: () => CancellationRequest[];
   getPendingCancellationRequests: () => CancellationRequest[];
-  getCancellationRequestForBooking: (bookingId: string) => CancellationRequest | undefined;
+  getCancellationRequestForBooking: (status: string) => CancellationRequest | undefined;
   isRoomAvailable: (roomId: string, startDate: string, endDate: string, excludeBookingId?: string) => boolean;
   getCurrentBookingsForRoom: (roomId: string) => Booking[];
   getFutureBookingsForRoom: (roomId: string) => Booking[];
@@ -167,8 +167,8 @@ export const useBookingStore = create<BookingState>((set, get) => ({
       throw new Error('Cannot request cancellation for this booking');
     }
 
-    const existingRequest = get().getCancellationRequestForBooking(bookingId);
-    if (existingRequest && existingRequest.status === 'pending') {
+    const existingRequest = getCancellationRequestForBooking(bookingId);
+    if (existingRequest && existingRequest === 'pending') {
       throw new Error('Cancellation request already exists');
     }
 
