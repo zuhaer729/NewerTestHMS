@@ -69,7 +69,12 @@ const RequestsPage: React.FC = () => {
                   request.status === 'approved' ? 'bg-green-100 text-green-800' :
                   'bg-red-100 text-red-800'
                 }`}>
-                  {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                  {request.status === 'approved' 
+                  ? 'Cancelled' 
+                  : request.status === 'rejected' 
+                  ? 'Not Cancelled' 
+                  : 'Pending'}
+
                 </div>
               </div>
               
