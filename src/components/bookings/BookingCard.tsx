@@ -16,7 +16,7 @@ interface BookingCardProps {
 
 const BookingCard: React.FC<BookingCardProps> = ({ booking, isActive, showRoom = false, roomNumber, onUpdate }) => {
   const { checkIn, checkOut, updateBooking, getCurrentBookingsForRoom, isRoomAvailable, requestCancellation, getCancellationRequestForBooking, cancelBooking } = useBookingStore();
-  const { getCurrentUserRole, getCurrentUser } = useAuthStore();
+  const { getCurrentUserRole, currentUser } = useAuthStore();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showExtendModal, setShowExtendModal] = useState(false);
   const [paidAmount, setPaidAmount] = useState(booking.paidAmount.toString());
@@ -25,7 +25,6 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, isActive, showRoom =
   const [action, setAction] = useState<'checkIn' | 'checkOut' | null>(null);
   
   const userRole = getCurrentUserRole();
-  const currentUser = getCurrentUser();
   
   const cancellationRequest = getCancellationRequestForBooking(booking.id);
   
