@@ -21,7 +21,7 @@ interface BookingState {
   rejectCancellation: (requestId: string, userId: string) => boolean;
   getCancellationRequests: () => CancellationRequest[];
   getPendingCancellationRequests: () => CancellationRequest[];
-  getCancellationRequestForBooking: (status: string) => CancellationRequest | undefined;
+  getCancellationRequestForBooking: (bookingId: string) => CancellationRequest | undefined;
   isRoomAvailable: (roomId: string, startDate: string, endDate: string, excludeBookingId?: string) => boolean;
   getCurrentBookingsForRoom: (roomId: string) => Booking[];
   getFutureBookingsForRoom: (roomId: string) => Booking[];
