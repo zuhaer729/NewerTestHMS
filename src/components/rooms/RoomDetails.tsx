@@ -230,7 +230,7 @@ const RoomDetails: React.FC<RoomDetailsProps> = ({ roomId, onBack, onDeleted }) 
                 <p className="text-gray-500 text-center py-8">No current or future bookings</p>
               ) : (
                 <>
-                  {currentBookings.map(booking => (
+                  {activeCurrentBookings.map(booking => (
                     <BookingCard 
                       key={`${booking.id}-${refreshKey}`}
                       booking={booking} 
