@@ -155,7 +155,6 @@ export const useBookingStore = create<BookingState>((set, get) => ({
     return updated;
   },
 
-
   checkOut: (bookingId) => {
     const booking = get().getBookingById(bookingId);
     if (!booking || !booking.checkInDateTime || booking.checkOutDateTime) return false;
@@ -194,7 +193,6 @@ export const useBookingStore = create<BookingState>((set, get) => ({
     if (existingRequest) {
       throw new Error('Cancellation request already exists or has been reviewed');
     }
-
 
     const id = uuidv4();
     const request: CancellationRequest = {
@@ -280,7 +278,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
   isRoomAvailable: (roomId, startDate, endDate, excludeBookingId) => {
     const bookings = get().getBookingsForRoom(roomId);
     const requestStart = startOfDay(parseISO(startDate));
-    const requestEnd = startOfDay(addDays(parseISO(endDate), -1));
+    const requestEnd = startOfDay(parseISO(endDate));
     
     return !bookings.some((booking) => {
       if (excludeBookingId && booking.id === excludeBookingId) return false;
@@ -288,12 +286,12 @@ export const useBookingStore = create<BookingState>((set, get) => ({
       if (booking.cancelledAt) return false;
       
       const bookingStart = startOfDay(parseISO(booking.bookingDate));
-      const bookingEnd = startOfDay(addDays(parseISO(booking.bookingDate), booking.durationDays - 1));
+      const bookingEnd = startOfDay(addDays(parseISO(booking.bookingDate), booking.durationDays)); // Changed: Removed -1
       
       return (
-        (isWithinInterval(requestStart, { start: bookingStart, end: bookingEnd }) ||
-         isWithinInterval(requestEnd, { start: bookingStart, end: bookingEnd }) ||
-         (isBefore(requestStart, bookingStart) && isAfter(requestEnd, bookingEnd)))
+        isWithinInterval(requestStart, { start: bookingStart, end: bookingEnd }) ||
+        isWithinInterval(requestEnd, { start: bookingStart, end: bookingEnd }) ||
+        (isBefore(requestStart, bookingStart) && isAfter(requestEnd, bookingEnd))
       );
     });
   },
@@ -304,7 +302,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
       if (!booking.checkInDateTime || booking.checkOutDateTime) return false;
       
       const bookingStart = startOfDay(parseISO(booking.bookingDate));
-      const bookingEnd = startOfDay(addDays(parseISO(booking.bookingDate), booking.durationDays - 1));
+      const bookingEnd = startOfDay(addDays(parseISO(booking.bookingDate), booking.durationDays)); // Changed: Removed -1
       
       return isWithinInterval(now, { start: bookingStart, end: bookingEnd });
     });
@@ -331,18 +329,18 @@ export const useBookingStore = create<BookingState>((set, get) => ({
     const occupiedRoomIds = new Set<string>();
     
     const requestStart = startOfDay(parseISO(startDate));
-    const requestEnd = startOfDay(addDays(parseISO(endDate), -1));
+    const requestEnd = startOfDay(parseISO(endDate));
     
     allBookings.forEach((booking) => {
       if (booking.checkOutDateTime) return; // Room is available if booking is checked out
       
       const bookingStart = startOfDay(parseISO(booking.bookingDate));
-      const bookingEnd = startOfDay(addDays(parseISO(booking.bookingDate), booking.durationDays - 1));
+      const bookingEnd = startOfDay(addDays(parseISO(booking.bookingDate), booking.durationDays)); // Changed: Removed -1
       
       if (
-        (isWithinInterval(requestStart, { start: bookingStart, end: bookingEnd }) ||
-         isWithinInterval(requestEnd, { start: bookingStart, end: bookingEnd }) ||
-         (isBefore(requestStart, bookingStart) && isAfter(requestEnd, bookingEnd)))
+        isWithinInterval(requestStart, { start: bookingStart, end: bookingEnd }) ||
+        isWithinInterval(requestEnd, { start: bookingStart, end: bookingEnd }) ||
+        (isBefore(requestStart, bookingStart) && isAfter(requestEnd, bookingEnd))
       ) {
         occupiedRoomIds.add(booking.roomId);
       }
@@ -361,7 +359,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
       if (!booking.checkInDateTime || booking.checkOutDateTime) return;
       
       const bookingStart = startOfDay(parseISO(booking.bookingDate));
-      const bookingEnd = startOfDay(addDays(parseISO(booking.bookingDate), booking.durationDays - 1));
+      const bookingEnd = startOfDay(addDays(parseISO(booking.bookingDate), booking.durationDays)); // Changed: Removed -1
       
       if (isWithinInterval(now, { start: bookingStart, end: bookingEnd })) {
         occupiedRoomIds.add(booking.roomId);
@@ -379,7 +377,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
       if (booking.checkOutDateTime) return; // Room is available if booking is checked out
       
       const bookingStart = startOfDay(parseISO(booking.bookingDate));
-      const bookingEnd = startOfDay(addDays(parseISO(booking.bookingDate), booking.durationDays - 1));
+      const bookingEnd = startOfDay(addDays(parseISO(booking.bookingDate), booking.durationDays)); // Changed: Removed -1
       
       if (isWithinInterval(targetDate, { start: bookingStart, end: bookingEnd })) {
         bookedRoomIds.add(booking.roomId);
