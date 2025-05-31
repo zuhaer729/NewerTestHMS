@@ -16,31 +16,49 @@ const BookingsList: React.FC = () => {
   const today = new Date();
   
   // Sort bookings by date (most recent first)
-  const sortedBookings = [...bookings].sort((a, b) => {
-    // 1️⃣ Cancelled bookings always go last
-    const aIsCancelled = !!a.cancelledAt;
-    const bIsCancelled = !!b.cancelledAt;
-  
-    if (aIsCancelled && !bIsCancelled) return 1;
-    if (!aIsCancelled && bIsCancelled) return -1;
-  
-    // 2️⃣ Active bookings come first
-    const aIsActive = a.checkInDateTime && !a.checkOutDateTime;
-    const bIsActive = b.checkInDateTime && !b.checkOutDateTime;
-  
-    if (aIsActive && !bIsActive) return -1;
-    if (!aIsActive && bIsActive) return 1;
-  
-    // 3️⃣ Future bookings come next
-    const aIsFuture = !a.checkInDateTime;
-    const bIsFuture = !b.checkInDateTime;
-  
-    if (aIsFuture && !bIsFuture) return -1;
-    if (!aIsFuture && bIsFuture) return 1;
-  
-    // 4️⃣ Finally sort by booking date (most recent first)
-    return new Date(b.bookingDate).getTime() - new Date(a.bookingDate).getTime();
-  });
+const sortedBookings = [...bookings].sort((a, b) => {
+  const aIsCancelled = !!a.cancelledAt;
+  const bIsCancelled = !!b.cancelledAt;
+
+  const aIsActive = a.checkInDateTime && !a.checkOutDateTime;
+  const bIsActive = b.checkInDateTime && !b.checkOutDateTime;
+
+  const aIsFuture = !a.checkInDateTime && !a.cancelledAt;
+  const bIsFuture = !b.checkInDateTime && !b.cancelledAt;
+
+  const aIsPast = a.checkInDateTime && a.checkOutDateTime;
+  const bIsPast = b.checkInDateTime && b.checkOutDateTime;
+
+  const getPriority = (booking: Booking) => {
+    if (booking.checkInDateTime && !booking.checkOutDateTime) return 1;  // Active
+    if (!booking.checkInDateTime && !booking.cancelledAt) return 2;      // Not checked in yet
+    if (booking.checkInDateTime && booking.checkOutDateTime) return 3;   // Past
+    if (booking.cancelledAt) return 4;                                    // Cancelled
+    return 5;
+  };
+
+  const priorityA = getPriority(a);
+  const priorityB = getPriority(b);
+
+  if (priorityA !== priorityB) return priorityA - priorityB;
+
+  // Sub-sorting inside categories
+  if (priorityA === 1) {
+    return new Date(a.checkInDateTime!).getTime() - new Date(b.checkInDateTime!).getTime();
+  }
+  if (priorityA === 2) {
+    return new Date(a.bookingDate).getTime() - new Date(b.bookingDate).getTime();
+  }
+  if (priorityA === 3) {
+    return new Date(b.checkOutDateTime!).getTime() - new Date(a.checkOutDateTime!).getTime();
+  }
+  if (priorityA === 4) {
+    return new Date(b.cancelledAt!).getTime() - new Date(a.cancelledAt!).getTime();
+  }
+
+  return 0;
+});
+
 
 
   
