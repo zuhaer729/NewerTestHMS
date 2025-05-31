@@ -276,7 +276,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
   isRoomAvailable: (roomId, startDate, endDate, excludeBookingId) => {
     const bookings = get().getBookingsForRoom(roomId);
     const requestStart = startOfDay(parseISO(startDate));
-    const requestEnd = startOfDay(parseISO(endDate));
+    const requestEnd = startOfDay(addDays(parseISO(endDate), -1));
     
     return !bookings.some((booking) => {
       if (excludeBookingId && booking.id === excludeBookingId) return false;
@@ -285,8 +285,6 @@ export const useBookingStore = create<BookingState>((set, get) => ({
       const bookingStart = startOfDay(parseISO(booking.bookingDate));
       const bookingEnd = startOfDay(addDays(parseISO(booking.bookingDate), booking.durationDays - 1));
       
-      // Check if the requested dates overlap with the booking period
-      // The room is considered occupied from check-in date until the day before check-out
       return (
         isWithinInterval(requestStart, { start: bookingStart, end: bookingEnd }) ||
         isWithinInterval(requestEnd, { start: bookingStart, end: bookingEnd }) ||
@@ -301,7 +299,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
       if (!booking.checkInDateTime || booking.checkOutDateTime) return false;
       
       const bookingStart = startOfDay(parseISO(booking.bookingDate));
-      const bookingEnd = startOfDay(addDays(parseISO(booking.bookingDate), booking.durationDays), -1);
+      const bookingEnd = startOfDay(addDays(parseISO(booking.bookingDate), booking.durationDays - 1));
       
       return isWithinInterval(now, { start: bookingStart, end: bookingEnd });
     });
@@ -328,7 +326,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
     const occupiedRoomIds = new Set<string>();
     
     const requestStart = startOfDay(parseISO(startDate));
-    const requestEnd = startOfDay(parseISO(endDate));
+    const requestEnd = startOfDay(addDays(parseISO(endDate), -1));
     
     allBookings.forEach((booking) => {
       if (booking.checkOutDateTime || booking.cancelledAt) return;
