@@ -26,12 +26,14 @@ const GuestsList: React.FC = () => {
   });
   
   const sortedGuests = [...filteredGuests].sort((a, b) => {
-    const aBookingCount = getBookingsForGuest(a.id).length;
-    const bBookingCount = getBookingsForGuest(b.id).length;
-    return bBookingCount - aBookingCount;
+    const aBookings = getBookingsForGuest(a.id).filter(b => !b.cancelledAt);
+    const bBookings = getBookingsForGuest(b.id).filter(b => !b.cancelledAt);
+  
+    const aLatest = aBookings.length > 0 ? Math.max(...aBookings.map(b => parseISO(b.bookingDate).getTime())) : 0;
+    const bLatest = bBookings.length > 0 ? Math.max(...bBookings.map(b => parseISO(b.bookingDate).getTime())) : 0;
+  
+    return bLatest - aLatest;
   });
-
-
   
   return (
     <div className="space-y-6">
