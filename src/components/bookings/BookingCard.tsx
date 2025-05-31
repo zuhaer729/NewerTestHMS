@@ -169,7 +169,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, isActive, showRoom =
     if (isNaN(parsedExtraDays) || parsedExtraDays < 1) {
       return 'Please enter a valid number of days';
     }
-    const currentEndDate = addDays(parseISO(booking.bookingDate), booking.durationDays);
+    const currentEndDate = addDays(parseISO(booking.bookingDate), booking.durationDays - 1);
     return format(addDays(currentEndDate, parsedExtraDays), 'dd/MM/yyyy');
   };
   
