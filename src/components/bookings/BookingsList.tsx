@@ -17,20 +17,31 @@ const BookingsList: React.FC = () => {
   
   // Sort bookings by date (most recent first)
   const sortedBookings = [...bookings].sort((a, b) => {
+    // 1️⃣ Cancelled bookings always go last
+    const aIsCancelled = !!a.cancelledAt;
+    const bIsCancelled = !!b.cancelledAt;
+  
+    if (aIsCancelled && !bIsCancelled) return 1;
+    if (!aIsCancelled && bIsCancelled) return -1;
+  
+    // 2️⃣ Active bookings come first
     const aIsActive = a.checkInDateTime && !a.checkOutDateTime;
     const bIsActive = b.checkInDateTime && !b.checkOutDateTime;
   
     if (aIsActive && !bIsActive) return -1;
     if (!aIsActive && bIsActive) return 1;
   
+    // 3️⃣ Future bookings come next
     const aIsFuture = !a.checkInDateTime;
     const bIsFuture = !b.checkInDateTime;
   
     if (aIsFuture && !bIsFuture) return -1;
     if (!aIsFuture && bIsFuture) return 1;
   
+    // 4️⃣ Finally sort by booking date (most recent first)
     return new Date(b.bookingDate).getTime() - new Date(a.bookingDate).getTime();
   });
+
 
   
   const filteredBookings = sortedBookings.filter(booking => {
