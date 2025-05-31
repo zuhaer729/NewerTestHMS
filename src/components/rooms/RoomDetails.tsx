@@ -32,7 +32,14 @@ const RoomDetails: React.FC<RoomDetailsProps> = ({ roomId, onBack, onDeleted }) 
   const userRole = getCurrentUserRole();
   const isAdmin = userRole === 'admin';
   const activeCurrentBookings = currentBookings.filter(b => !b.cancelledAt);
-  const activeFutureBookings = futureBookings.filter(b => !b.cancelledAt);
+  const activeFutureBookings = futureBookings
+    .filter(b => !b.cancelledAt)
+    .sort((a, b) => {
+      const aBookingDate = parseISO(a.bookingDate).getTime();
+      const bBookingDate = parseISO(b.bookingDate).getTime();
+      return aBookingDate - bBookingDate;
+    });
+
   
   if (!room) {
     return (
