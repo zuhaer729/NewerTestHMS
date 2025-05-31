@@ -25,46 +25,15 @@ const GuestsList: React.FC = () => {
     );
   });
   
-const today = startOfDay(new Date());
-
-const sortedGuests = [...filteredGuests].sort((a, b) => {
-  const getPriority = (guest) => {
-    const bookings = getBookingsForGuest(guest.id);
-
-    const active = bookings.some(b => b.checkInDateTime && !b.checkOutDateTime);
-    if (active) return 0;
-
-    const future = bookings.some(b => {
-      if (b.cancelledAt || b.checkInDateTime) return false;
-      const bookingDate = parseISO(b.bookingDate);
-      return isAfter(bookingDate, today) || bookingDate.getTime() === today.getTime();
-    });
-    if (future) return 1;
-
-    const pastBookings = bookings.filter(b => b.checkOutDateTime && !b.cancelledAt);
-    if (pastBookings.length > 0) return 2;
-
-    return 3; // only cancelled or no bookings
-  };
-
-  const priorityA = getPriority(a);
-  const priorityB = getPriority(b);
-
-  if (priorityA !== priorityB) return priorityA - priorityB;
-
-  // tie-breaker: most recent booking date
-  const latestBookingA = getBookingsForGuest(a.id).reduce((latest, b) => {
-    const date = parseISO(b.bookingDate).getTime();
-    return Math.max(latest, date);
-  }, 0);
-
-  const latestBookingB = getBookingsForGuest(b.id).reduce((latest, b) => {
-    const date = parseISO(b.bookingDate).getTime();
-    return Math.max(latest, date);
-  }, 0);
-
-  return latestBookingB - latestBookingA;
-});
+  const sortedGuests = [...filteredGuests].sort((a, b) => {
+    const aBookings = getBookingsForGuest(a.id).filter(b => !b.cancelledAt);
+    const bBookings = getBookingsForGuest(b.id).filter(b => !b.cancelledAt);
+  
+    const aLatest = aBookings.length > 0 ? Math.max(...aBookings.map(b => parseISO(b.bookingDate).getTime())) : 0;
+    const bLatest = bBookings.length > 0 ? Math.max(...bBookings.map(b => parseISO(b.bookingDate).getTime())) : 0;
+  
+    return bLatest - aLatest;
+  });
 
   
   return (
