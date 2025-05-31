@@ -15,6 +15,7 @@ const GuestsList: React.FC = () => {
   
   const filteredGuests = guests.filter(guest => {
     if (!searchTerm) return true;
+
     
     const searchLower = searchTerm.toLowerCase();
     return (
