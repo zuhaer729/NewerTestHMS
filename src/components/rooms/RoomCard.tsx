@@ -42,7 +42,7 @@ const renderBookingInfo = () => {
 
   return (
     <div 
-      className={`card card-hover border ${getStatusColor()} p-3 flex flex-col justify-between min-h-[160px]`}
+      className={`card card-hover border ${getStatusColor()} p-3 flex flex-col justify-between min-h-[10px]`}
 
       onClick={onClick}
       role="button"
