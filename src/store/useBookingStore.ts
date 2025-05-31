@@ -334,7 +334,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
       if (booking.checkOutDateTime || booking.cancelledAt) return;
       
       const bookingStart = startOfDay(parseISO(booking.bookingDate));
-      const bookingEnd = startOfDay(addDays(parseISO(booking.bookingDate), booking.durationDays));
+      const bookingEnd = startOfDay(addDays(parseISO(booking.bookingDate), booking.durationDays - 1));
       
       if (
         isWithinInterval(requestStart, { start: bookingStart, end: bookingEnd }) ||
