@@ -16,36 +16,22 @@ const BookingsList: React.FC = () => {
   const today = new Date();
   
   // Sort bookings by date (most recent first)
-  const getPriority = (booking: Booking) => {
-    if (booking.cancelledAt) return 4;
-    if (booking.checkInDateTime && !booking.checkOutDateTime) return 0;
-  
-    const bookingStart = parseISO(booking.bookingDate);
-    const bookingEnd = addDays(bookingStart, booking.durationDays - 1);
-  
-    if (
-      bookingStart <= today &&
-      bookingEnd >= today
-    ) {
-      return 1; // booking includes today but not checked-in yet
-    }
-  
-    if (bookingStart > today) return 2;
-  
-    return 3;
-  };
-  
   const sortedBookings = [...bookings].sort((a, b) => {
-    const priorityA = getPriority(a);
-    const priorityB = getPriority(b);
+    const aIsActive = a.checkInDateTime && !a.checkOutDateTime;
+    const bIsActive = b.checkInDateTime && !b.checkOutDateTime;
   
-    if (priorityA !== priorityB) {
-      return priorityA - priorityB;
-    }
+    if (aIsActive && !bIsActive) return -1;
+    if (!aIsActive && bIsActive) return 1;
   
-    // if both same priority, sort most recent first by bookingDate
+    const aIsFuture = !a.checkInDateTime;
+    const bIsFuture = !b.checkInDateTime;
+  
+    if (aIsFuture && !bIsFuture) return -1;
+    if (!aIsFuture && bIsFuture) return 1;
+  
     return new Date(b.bookingDate).getTime() - new Date(a.bookingDate).getTime();
   });
+
   
   const filteredBookings = sortedBookings.filter(booking => {
     if (!searchTerm) return true;
