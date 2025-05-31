@@ -49,7 +49,7 @@ const GuestsList: React.FC = () => {
           <p className="text-gray-500">No guests found</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2">
           {sortedGuests.map(guest => {
             const bookings = getBookingsForGuest(guest.id);
             const activeBooking = bookings.find(b => b.checkInDateTime && !b.checkOutDateTime);
