@@ -284,7 +284,6 @@ export const useBookingStore = create<BookingState>((set, get) => ({
       
       const bookingStart = startOfDay(parseISO(booking.bookingDate));
       const bookingEnd = startOfDay(addDays(parseISO(booking.bookingDate), booking.durationDays - 1));
-
       
       // Check if the requested dates overlap with the booking period
       // The room is considered occupied from check-in date until the day before check-out
