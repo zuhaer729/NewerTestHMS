@@ -49,7 +49,7 @@ const RoomsList: React.FC<RoomsListProps> = ({ onSelectRoom, filter }) => {
         if (booking.checkOutDateTime) return false; // Skip checked-out bookings
         
         const bookingStart = parseISO(booking.bookingDate);
-        const bookingEnd = addDays(bookingStart, booking.durationDays);
+        const bookingEnd = addDays(parseISO(booking.bookingDate), booking.durationDays - 1);
         const filterStart = parseISO(startDate);
         const filterEnd = parseISO(endDate);
         
