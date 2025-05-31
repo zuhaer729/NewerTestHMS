@@ -25,15 +25,65 @@ const GuestsList: React.FC = () => {
     );
   });
   
-  const sortedGuests = [...filteredGuests].sort((a, b) => {
-    const aBookings = getBookingsForGuest(a.id).filter(b => !b.cancelledAt);
-    const bBookings = getBookingsForGuest(b.id).filter(b => !b.cancelledAt);
-  
-    const aLatest = aBookings.length > 0 ? Math.max(...aBookings.map(b => parseISO(b.bookingDate).getTime())) : 0;
-    const bLatest = bBookings.length > 0 ? Math.max(...bBookings.map(b => parseISO(b.bookingDate).getTime())) : 0;
-  
-    return bLatest - aLatest;
-  });
+const sortedGuests = [...filteredGuests].sort((a, b) => {
+  const aBookings = getBookingsForGuest(a.id);
+  const bBookings = getBookingsForGuest(b.id);
+
+  // Helper to determine guest's booking category priority
+  const getGuestPriority = (bookings: Booking[]) => {
+    const activeBooking = bookings.find(b => b.checkInDateTime && !b.checkOutDateTime);
+    if (activeBooking) return 1;
+
+    const upcomingBooking = bookings.find(b => !b.checkInDateTime && !b.cancelledAt);
+    if (upcomingBooking) return 2;
+
+    const pastBooking = bookings.find(b => b.checkInDateTime && b.checkOutDateTime);
+    if (pastBooking) return 3;
+
+    const cancelledBooking = bookings.find(b => b.cancelledAt);
+    if (cancelledBooking) return 4;
+
+    return 5; // guests with no bookings
+  };
+
+  const priorityA = getGuestPriority(aBookings);
+  const priorityB = getGuestPriority(bBookings);
+
+  if (priorityA !== priorityB) return priorityA - priorityB;
+
+  // Sub-sorting inside each group
+
+  // 1️⃣ Currently staying (Active): newest check-in first
+  if (priorityA === 1) {
+    const aCheckIn = Math.max(...aBookings.filter(b => b.checkInDateTime && !b.checkOutDateTime).map(b => parseISO(b.checkInDateTime!).getTime()));
+    const bCheckIn = Math.max(...bBookings.filter(b => b.checkInDateTime && !b.checkOutDateTime).map(b => parseISO(b.checkInDateTime!).getTime()));
+    return bCheckIn - aCheckIn;
+  }
+
+  // 2️⃣ Upcoming: oldest bookingDate first
+  if (priorityA === 2) {
+    const aBookingDate = Math.min(...aBookings.filter(b => !b.checkInDateTime && !b.cancelledAt).map(b => parseISO(b.bookingDate).getTime()));
+    const bBookingDate = Math.min(...bBookings.filter(b => !b.checkInDateTime && !b.cancelledAt).map(b => parseISO(b.bookingDate).getTime()));
+    return aBookingDate - bBookingDate;
+  }
+
+  // 3️⃣ Past stays: newest check-out first
+  if (priorityA === 3) {
+    const aCheckout = Math.max(...aBookings.filter(b => b.checkOutDateTime).map(b => parseISO(b.checkOutDateTime!).getTime()));
+    const bCheckout = Math.max(...bBookings.filter(b => b.checkOutDateTime).map(b => parseISO(b.checkOutDateTime!).getTime()));
+    return bCheckout - aCheckout;
+  }
+
+  // 4️⃣ Cancelled: newest cancelledAt first
+  if (priorityA === 4) {
+    const aCancelled = Math.max(...aBookings.filter(b => b.cancelledAt).map(b => parseISO(b.cancelledAt!).getTime()));
+    const bCancelled = Math.max(...bBookings.filter(b => b.cancelledAt).map(b => parseISO(b.cancelledAt!).getTime()));
+    return bCancelled - aCancelled;
+  }
+
+  return 0;
+});
+
 
   
   return (
