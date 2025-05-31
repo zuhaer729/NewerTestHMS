@@ -55,7 +55,7 @@ Room {room.roomNumber}</h3>
         </div>
       </div>
 
-      {currentBooking && (
+      {currentBooking?.checkInDateTime && !currentBooking?.checkOutDateTime && (
         <div className="pt-2">
           <p className="text-sm font-medium">{currentBooking.guestName}</p>
           <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -67,6 +67,7 @@ Room {room.roomNumber}</h3>
           </div>
         </div>
       )}
+
     </div>
   );
 };
