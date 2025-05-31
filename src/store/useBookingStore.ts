@@ -168,9 +168,20 @@ export const useBookingStore = create<BookingState>((set, get) => ({
     const booking = get().getBookingById(bookingId);
     if (!booking || booking.checkInDateTime || booking.cancelledAt) return false;
     
-    return get().updateBooking(bookingId, {
+    const updated = get().updateBooking(bookingId, {
       cancelledAt: new Date().toISOString()
     });
+  
+    if (updated) {
+      // Remove any existing cancellation requests for this booking
+      set(state => ({
+        cancellationRequests: state.cancellationRequests.filter(
+          (request) => request.bookingId !== bookingId
+        )
+      }));
+    }
+  
+    return updated;
   },
 
   requestCancellation: (bookingId, userId) => {
