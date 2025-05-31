@@ -81,7 +81,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, isActive, showRoom =
       return;
     }
 
-    const currentEndDate = addDays(parseISO(booking.bookingDate), booking.durationDays);
+    const currentEndDate = addDays(parseISO(booking.bookingDate), booking.durationDays - 1);
     const newEndDate = format(addDays(currentEndDate, parsedExtraDays), 'yyyy-MM-dd');
 
     if (!isRoomAvailable(
