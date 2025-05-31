@@ -21,6 +21,25 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, currentBooking, onClick, isAv
     return 'bg-green-100 border-green-300';
   };
 
+const renderBookingInfo = () => {
+  if (currentBooking?.checkInDateTime && !currentBooking?.checkOutDateTime) {
+    return (
+      <div className="pt-2">
+        <p className="text-sm font-medium">{currentBooking.guestName}</p>
+        <div className="flex justify-between text-xs text-gray-500 mt-1">
+          <span>
+            {format(parseISO(currentBooking.bookingDate), 'dd/MM/yyyy')} - 
+            {format(addDays(parseISO(currentBooking.bookingDate), currentBooking.durationDays), 'dd/MM/yyyy')}
+          </span>
+          <span>{currentBooking.durationDays} days</span>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
+
   return (
     <div 
       className={`card card-hover border ${getStatusColor()} p-3`}
