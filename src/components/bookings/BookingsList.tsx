@@ -44,7 +44,7 @@ const sortedBookings = [...bookings].sort((a, b) => {
 
   // Sub-sorting inside categories
   if (priorityA === 1) {
-    return new Date(a.checkInDateTime!).getTime() - new Date(b.checkInDateTime!).getTime();
+    return new Date(b.checkInDateTime!).getTime() - new Date(a.checkInDateTime!).getTime();
   }
   if (priorityA === 2) {
     return new Date(a.bookingDate).getTime() - new Date(b.bookingDate).getTime();
