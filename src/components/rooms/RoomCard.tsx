@@ -42,7 +42,7 @@ const renderBookingInfo = () => {
 
   return (
     <div 
-      className={`card card-hover border ${getStatusColor()} p-3 min-h-[30px]`}
+      className={`card card-hover border ${getStatusColor()} p-3`}
       onClick={onClick}
       role="button"
       tabIndex={0}
